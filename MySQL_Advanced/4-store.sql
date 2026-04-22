@@ -1,6 +1,7 @@
---Hər dəfə orders cədvəlinə yeni sifariş əlavə olunanda → avtomatik items.quantity azalsın--
+-- SQL
 DELIMITER $$
-CREATE TRIGGER decrease_quantity
+
+CREATE TRIGGER decrease_item_quantity
 AFTER INSERT ON orders
 FOR EACH ROW
 BEGIN
