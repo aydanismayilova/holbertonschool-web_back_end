@@ -24,3 +24,4 @@ class Auth:
     def current_user(self, request=None) -> TypeVar('User'):
         """This funct is checking current user"""
         return None
+    
