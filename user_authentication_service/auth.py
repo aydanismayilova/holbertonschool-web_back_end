@@ -21,19 +21,35 @@ def _hash_password(password: str) -> bytes:
     Returns salted and hashed password using bcrypt.hashpw()
     """
     if bcrypt is not None:
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        return bcrypt.hashpw(
+            password.encode("utf-8"),
+            bcrypt.gensalt()
+        )
 
     salt = os.urandom(16)
+
     digest = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt, 100_000
+        "sha256",
+        password.encode("utf-8"),
+        salt,
+        100_000
     )
-    return b"pbkdf2_sha256$" + salt.hex().encode("utf-8") + b"$" + digest.hex().encode("utf-8")
+
+    return (
+        b"pbkdf2_sha256$"
+        + salt.hex().encode("utf-8")
+        + b"$"
+        + digest.hex().encode("utf-8")
+    )
 
 
 def _is_valid_password(password: str, hashed_password: bytes) -> bool:
     """Verify a password against either bcrypt or fallback hash format."""
     if bcrypt is not None:
-        return bcrypt.checkpw(password.encode("utf-8"), hashed_password)
+        return bcrypt.checkpw(
+            password.encode("utf-8"),
+            hashed_password
+        )
 
     try:
         algo, salt_hex, digest_hex = hashed_password.split(b"$", 2)
@@ -49,6 +65,7 @@ def _is_valid_password(password: str, hashed_password: bytes) -> bool:
         bytes.fromhex(salt_hex.decode("utf-8")),
         100_000,
     ).hex().encode("utf-8")
+
     return hmac.compare_digest(recomputed, digest_hex)
 
 
@@ -72,7 +89,6 @@ class Auth:
         Hashes password with _hash_password, then saves user to database
         using self._db.add_user() and then returns the User object
 
-
         If a user already exists with the passed email, raise ValueError
 
         Args:
@@ -84,10 +100,17 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(email=email)
+
             if user:
-                raise ValueError("User {} already exists".format(email))
-        except NoResultFound as e:
-            return self._db.add_user(email, _hash_password(password))
+                raise ValueError(
+                    "User {} already exists".format(email)
+                )
+
+        except NoResultFound:
+            return self._db.add_user(
+                email,
+                _hash_password(password)
+            )
 
     def valid_login(self, email: str, password: str) -> bool:
         """
@@ -102,10 +125,16 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(email=email)
+
             if user:
-                return _is_valid_password(password, user.hashed_password)
+                return _is_valid_password(
+                    password,
+                    user.hashed_password
+                )
+
             return False
-        except NoResultFound as e:
+
+        except NoResultFound:
             return False
 
     def create_session(self, email: str) -> str:
@@ -121,8 +150,10 @@ class Auth:
             str: UUID
         """
         user = self._db.find_user_by(email=email)
+
         session_id = _generate_uuid()
         user.session_id = session_id
+
         return session_id
 
     def get_user_from_session_id(self, session_id: str) -> User:
@@ -137,8 +168,11 @@ class Auth:
             Otherwise, return User object
         """
         try:
-            return self._db.find_user_by(session_id=session_id)
-        except NoResultFound as e:
+            return self._db.find_user_by(
+                session_id=session_id
+            )
+
+        except NoResultFound:
             return None
 
     def destroy_session(self, user_id: int) -> None:
@@ -169,19 +203,31 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(email=email)
+
             if user:
                 reset_token = _generate_uuid()
-                self._db.update_user(user.id, reset_token=reset_token)
+
+                self._db.update_user(
+                    user.id,
+                    reset_token=reset_token
+                )
+
                 return reset_token
-        except Exception as e:
+
+        except Exception:
             raise ValueError()
 
-    def update_password(self, reset_token: str, password: str) -> None:
+    def update_password(
+        self,
+        reset_token: str,
+        password: str
+    ) -> None:
         """
         Uses <reset_token> to find corresponding User.
 
-        Hashes the password and updates the user's <hashed_password> field
-        with the new hashed password and the <reset_token> field to None
+        Hashes the password and updates the user's
+        <hashed_password> field with the new hashed
+        password and the <reset_token> field to None
 
         Args:
             reset_token (str): UUID
@@ -192,9 +238,18 @@ class Auth:
             None
         """
         try:
-            user = self._db.find_user_by(reset_token=reset_token)
+            user = self._db.find_user_by(
+                reset_token=reset_token
+            )
+
             if user:
                 user.hashed_password = _hash_password(password)
-                self._db.update_user(user.id, reset_token=None)
-        except Exception as e:
+
+                self._db.update_user(
+                    user.id,
+                    reset_token=None
+                )
+
+        except Exception:
             raise ValueError()
+
