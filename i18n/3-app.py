@@ -1,34 +1,39 @@
 #!/usr/bin/env python3
-"""3-app.py"""
-from flask import Flask, render_template, request
+"""
+This module is for Babel object instantiation
+"""
+from flask import Flask, request, render_template
 from flask_babel import Babel
 
 
-class Config(object):
-    """Config class for Babel"""
-    LANGUAGES = ['en', 'fr']
+class Config:
+    """
+    This class is for configuring the languages
+    """
+    LANGUAGES = ["en", "fr"]
     BABEL_DEFAULT_LOCALE = 'en'
     BABEL_DEFAULT_TIMEZONE = 'UTC'
-    BABEL_TRANSLATION_DIRECTORIES = 'translations'
+
+
+def get_locale():
+    """
+    Determines the best match for supported languages
+    """
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
-
-def get_locale():
-    """Determines supported lang."""
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
-
-
 babel = Babel(app, locale_selector=get_locale)
 
 
 @app.route('/')
-def main_page():
-    """Main page route that renders the index template"""
-    return render_template('3-index.html'), 200
+def home():
+    """
+    Renders the template
+    """
+    return render_template('2-index.html')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000, debug=True)
