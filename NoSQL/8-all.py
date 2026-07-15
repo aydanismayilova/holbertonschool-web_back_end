@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Lists all documents in a mongodb collection"""
+'''List all documents in collection'''
 
 
 def list_all(mongo_collection):
-	"""Lists all documents in a mongodb collection"""
-	return mongo_collection.find()
+    '''Function to list documents'''
+    documents = list(mongo_collection.find())
+    if documents:
+        return documents
+    return []
