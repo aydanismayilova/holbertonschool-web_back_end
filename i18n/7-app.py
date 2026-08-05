@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""7-app.py"""
+"""6-app.py"""
 from flask import Flask, render_template, request, g
 from flask_babel import Babel
 import pytz
+
+app = Flask(__name__)
 
 
 users = {
@@ -14,14 +16,13 @@ users = {
 
 
 class Config(object):
-    """Config class"""
+    """Config class for Babel"""
     LANGUAGES = ['en', 'fr']
     BABEL_DEFAULT_LOCALE = 'en'
     BABEL_DEFAULT_TIMEZONE = 'UTC'
     BABEL_TRANSLATION_DIRECTORIES = 'translations'
 
 
-app = Flask(__name__)
 app.config.from_object(Config)
 
 
@@ -55,7 +56,7 @@ def get_locale():
 
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
-
+@timezoneselector
 def get_timezone():
     """Determine the best match with our supported timezones."""
     timezone = request.args.get('timezone')

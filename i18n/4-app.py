@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""4-app.py"""
+"""3-app.py"""
 from flask import Flask, render_template, request
 from flask_babel import Babel
 
@@ -17,10 +17,10 @@ app.config.from_object(Config)
 
 
 def get_locale():
-    """Get locale from URL"""
-    locale = request.args.get('locale')
-    if locale in app.config['LANGUAGES']:
-        return locale
+    """Determines supported lang."""
+    local = request.args.get('locale')
+    if local in app.config['LANGUAGES']:
+        return local
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
@@ -29,7 +29,7 @@ babel = Babel(app, locale_selector=get_locale)
 
 @app.route('/')
 def main_page():
-    """Main page route"""
+    """Main page route that renders the index template"""
     return render_template('4-index.html'), 200
 
 

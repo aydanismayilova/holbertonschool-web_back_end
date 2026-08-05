@@ -1,2 +1,2 @@
-// NoSQL
+// Count
 db.school.count()
