@@ -48,4 +48,3 @@ def forbidden() -> str:
     By calling abort(403) the error handler for 403 is executed.
     """
     abort(403)
-    

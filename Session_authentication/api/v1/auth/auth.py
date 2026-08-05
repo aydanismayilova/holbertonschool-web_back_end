@@ -18,23 +18,6 @@ class Auth():
         """"
         Method that returns True if the <path> is not in the list of strings
         <excluded_paths>.
-
-        You can assume <excluded_paths> contains string path always ending
-        with a '/'.
-
-        This method is slash intolerant. For example, if <path> is '/v1/auth'
-        and <excluded_paths> is ['/v1/auth/', '/v1/auths/'], then this method
-        will return False.
-
-        Args:
-            path(str): The path to check against <excluded_paths>
-            excluded_paths(List[str]): The list of paths to check against
-
-        Additional Returns:
-            True if <path> is None
-            True if <path> is None
-            True if <excluded_paths> is None or empty
-            False if <path> is in <excluded_paths>
         """
         if excluded_paths is None or not len(excluded_paths) or path is None:
             return True
